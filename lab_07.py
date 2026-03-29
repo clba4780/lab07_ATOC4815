@@ -7,15 +7,15 @@ import matplotlib.pyplot as plt
 
 # Load our CAMulator sample dataset
 ds = xr.open_dataset('sample_data_camulator.nc')
+ds_coords = ds.assign_coords(longitude =((ds.longitude+180)%360)-180)
 
-
+europe = ds_coords['TREFHT'].isel(time=0).sel(latitude=slice(35,72), longitude=slice(-25,45))
+print (europe)
 fig, ax = plt.subplots(
     figsize = (10,5),
-    subplot_kw= {'projection': ccrs.Robinson()}
-)
-# 2. Choose a good sequential colormap for precipitation (hint: 'GnBu' or 'Blues')
-# 3. Place the colorbar horizontally below the map
-ds['TREFHT'].isel(time=0, latitude=slice(35,72), longitude=slice(25,65)).plot(
+    subplot_kw= {'projection': ccrs.Robinson()})
+
+europe.plot(
     ax = ax,
     transform=ccrs.PlateCarree(),
     cmap='GnBu', 
