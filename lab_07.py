@@ -24,11 +24,24 @@ print (region)
 spatial_mean = ds['TREFHT'].mean(dim=['latitude','longitude'])
 print (f"Shape: {spatial_mean.shape}")
 print (spatial_mean.values)
+
 # plot time series
 ds["TREFHT"].isel(time=0).plot(cmap='plasma')
 plt.title('Flat lat/lon plot')
 plt.tight_layout
 plt.show()
+
 # compute the anomoly
+ds = xr.Dataset({
+    't2m': (['time'], spatial_mean)},
+    coords={'time':#i dont know what to put here
+            }
+            
+)
+monthly_clim = region['t2m'].groupby('time.month').mean()
+anomaly = region['t2m'].groupby('time.month') - monthly_clim
+
+print ("Anomalies (first week):")
+print (anomaly.isel(time=slice(0,7)).values)
 
 # make a robinson projection map
