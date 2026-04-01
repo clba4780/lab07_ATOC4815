@@ -21,18 +21,18 @@ region = ds['TREFHT'].sel(
 print ("Western-US Region shape: ", region.shape)
 print (region)
 
-spatial_mean = ds['TREFHT'].mean(dim=['latitude','longitude'])
+spatial_mean = region['TREFHT'].mean(dim=['latitude','longitude'])
 print (f"Shape: {spatial_mean.shape}")
 print (spatial_mean.values)
 
 # plot time series
-ds["TREFHT"].isel(time=0).plot(cmap='plasma')
+region["TREFHT"].isel(time=0).plot(cmap='plasma')
 plt.title('Flat lat/lon plot')
 plt.tight_layout
 plt.show()
 
 # compute the anomoly
-ds = xr.Dataset({
+ds_time = xr.Dataset({
     't2m': (['time'], spatial_mean)},
     coords={'time':#i dont know what to put here
             }
@@ -45,3 +45,18 @@ print ("Anomalies (first week):")
 print (anomaly.isel(time=slice(0,7)).values)
 
 # make a robinson projection map
+fig, ax = plt.subplots(
+    figsize = (10,5),
+    subplot_kw = {'projection': ccrs.Robinson()},
+)
+
+region['TREFHT'].isel(time=0).plot(
+    ax = ax,
+    transform = ccrs.PlateCarree(),
+    cmap = 'GnBl',
+    cbar_kwargs = {'label': '', 'shrink': 0.7}
+)
+
+ax.coastlines(linewidth=0.8)
+ax.add_feature(cfeature.BORDERS, linewidth = 0.5, alpha = 0.5)
+ax.add_feature(cfeature.LAND, linewidth = 0.8, )
