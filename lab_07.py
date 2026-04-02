@@ -11,11 +11,11 @@ ds = xr.open_dataset("sample_data_camulator.nc")
 print ("Dimensions:", dict(ds.dims))
 print ("Coordinates:", list(ds.coords))
 print ("Global Attributes", ds.attrs)
-print ("TREFHT Attributes", ds['TREFHT'].attrs)
+print ("PRECT Attributes", ds['PRECT'].attrs)
 
 # Select a region and average over the latitude and longitude - one value per time step
-region = ds['TREFHT'].sel(
-    latitude=(slice(30,50)), 
+region = ds['PRECT'].sel(
+    latitude=(slice(10,30)), 
     longitude=(slice(240,270))
     )
 print ("Western-US Region shape: ", region.shape)
@@ -28,9 +28,13 @@ print (spatial_mean.values)
 # plot time series
 plt.figure()
 spatial_mean.plot()
-plt.title('Regional Mean Temperature (TREFHT)')
+plt.title('Regional Mean Precipitation Over Mexico (PRECT)')
+plt.xlabel("Time (days)")
+plt.ylabel("Precipitation (mm/s)")
+plt.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.show()
+plt.savefig('regional_mean_precipitation.png', dpi=150, bbox_inches = 'tight')
+print ("regional_mean_precipitation.png saved successfully.")
 
 # compute the anomoly
 time_mean = spatial_mean.mean(dim='time')
@@ -42,9 +46,13 @@ print (anomaly.isel(time=slice(0,7)).values)
 
 plt.figure()
 anomaly.plot()
-plt.title('Temperature Anomaly (relative to time mean)')
+plt.title('Regional Precipitation Anomaly over Mexico (relative to time mean)')
+plt.xlabel("Time (days)")
+plt.ylabel("Precipitation (mm/s)")
+plt.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.show()
+plt.savefig('precipitation_anomaly.png', dpi=150, bbox_inches = 'tight')
+print ("precipitation_anomaly.png saved successfully.")
 
 # make a robinson projection map
 fig, ax = plt.subplots(
@@ -62,6 +70,7 @@ region.isel(time=0).plot(
 ax.coastlines(linewidth=0.8)
 ax.add_feature(cfeature.BORDERS, linewidth = 0.5, alpha = 0.5)
 ax.add_feature(cfeature.LAND, linewidth = 0.8, alpha = 0.8)
-ax.set_title('TREFHT Anomaly')
+ax.set_title('PRECT Precipitaton Anomaly Map Over Mexico')
 plt.tight_layout()
-plt.show()
+plt.savefig('regional_anomaly_mapping.png', dpi = 150, bbox_inches = 'tight')
+print("regional_anomaly_mapping.png saved successfully.")
