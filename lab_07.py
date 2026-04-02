@@ -26,18 +26,25 @@ print (f"Shape: {spatial_mean.shape}")
 print (spatial_mean.values)
 
 # plot time series
-region.isel(time=0).plot(cmap='plasma')
-plt.title('Flat lat/lon plot')
+plt.figure()
+spatial_mean.plot()
+plt.title('Regional Mean Temperature (TREFHT)')
 plt.tight_layout()
 plt.show()
 
 # compute the anomoly
-monthly_clim = spatial_mean.groupby('time.month').mean(dim='time')
+time_mean = spatial_mean.mean(dim='time')
 
-anomaly = spatial_mean.groupby('time.month') - monthly_clim
+anomaly = spatial_mean - time_mean
 
 print ("Anomalies (first week):")
 print (anomaly.isel(time=slice(0,7)).values)
+
+plt.figure()
+anomaly.plot()
+plt.title('Temperature Anomaly (relative to time mean)')
+plt.tight_layout()
+plt.show()
 
 # make a robinson projection map
 fig, ax = plt.subplots(
@@ -48,8 +55,8 @@ fig, ax = plt.subplots(
 region.isel(time=0).plot(
     ax = ax,
     transform = ccrs.PlateCarree(),
-    cmap = 'GnBu',
-    cbar_kwargs = {'label': '', 'shrink': 0.7}
+    cmap = 'Blues',
+    cbar_kwargs = {'label': 'Precipitation', 'shrink': 0.7}
 )
 
 ax.coastlines(linewidth=0.8)
