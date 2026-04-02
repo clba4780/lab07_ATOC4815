@@ -21,25 +21,20 @@ region = ds['TREFHT'].sel(
 print ("Western-US Region shape: ", region.shape)
 print (region)
 
-spatial_mean = region['TREFHT'].mean(dim=['latitude','longitude'])
+spatial_mean = region.mean(dim=['latitude','longitude'])
 print (f"Shape: {spatial_mean.shape}")
 print (spatial_mean.values)
 
 # plot time series
-region["TREFHT"].isel(time=0).plot(cmap='plasma')
+region.isel(time=0).plot(cmap='plasma')
 plt.title('Flat lat/lon plot')
-plt.tight_layout
+plt.tight_layout()
 plt.show()
 
 # compute the anomoly
-ds_time = xr.Dataset({
-    't2m': (['time'], spatial_mean)},
-    coords={'time':#i dont know what to put here
-            }
-            
-)
-monthly_clim = region['t2m'].groupby('time.month').mean()
-anomaly = region['t2m'].groupby('time.month') - monthly_clim
+monthly_clim = spatial_mean.groupby('time.month').mean(dim='time')
+
+anomaly = spatial_mean.groupby('time.month') - monthly_clim
 
 print ("Anomalies (first week):")
 print (anomaly.isel(time=slice(0,7)).values)
@@ -50,13 +45,16 @@ fig, ax = plt.subplots(
     subplot_kw = {'projection': ccrs.Robinson()},
 )
 
-region['TREFHT'].isel(time=0).plot(
+region.isel(time=0).plot(
     ax = ax,
     transform = ccrs.PlateCarree(),
-    cmap = 'GnBl',
+    cmap = 'GnBu',
     cbar_kwargs = {'label': '', 'shrink': 0.7}
 )
 
 ax.coastlines(linewidth=0.8)
 ax.add_feature(cfeature.BORDERS, linewidth = 0.5, alpha = 0.5)
-ax.add_feature(cfeature.LAND, linewidth = 0.8, )
+ax.add_feature(cfeature.LAND, linewidth = 0.8, alpha = 0.8)
+ax.set_title('TREFHT Anomaly')
+plt.tight_layout()
+plt.show()
